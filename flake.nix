@@ -22,6 +22,31 @@
         "x86_64-linux"
         "aarch64-linux"
       ];
+
+      pre-commit-hooks = forAllSystems (
+        system:
+        git-hooks.lib.${system}.run {
+          src = self;
+          hooks = {
+            nixfmt = {
+              enable = true;
+              package = nixpkgs.legacyPackages.${system}.nixfmt;
+            };
+            statix.enable = true;
+            deadnix.enable = true;
+            # AST-based secrets lint (catches bad patterns even in module examples)
+            nix-secrets-lint = {
+              enable = true;
+              name = "nix-secrets-lint";
+              entry = "${
+                nixpkgs.legacyPackages.${system}.ast-grep
+              }/bin/ast-grep scan --config ${self}/.ast-grep/sgconfig.yml";
+              types = [ "nix" ];
+              pass_filenames = false;
+            };
+          };
+        }
+      );
     in
     {
       # --- Module exports (consumed by private nix-config repo) ---
@@ -52,7 +77,7 @@
 
       # --- Self-contained tooling ---
 
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt-rfc-style);
+      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.nixfmt);
 
       checks = forAllSystems (
         system:
@@ -64,7 +89,7 @@
             pkgs.runCommand "check-formatting"
               {
                 buildInputs = with pkgs; [
-                  nixfmt-rfc-style
+                  nixfmt
                   findutils
                 ];
               }
@@ -112,29 +137,7 @@
               else
                 builtins.throw "security-tests failed: ${builtins.toJSON results}"
             );
-          pre-commit = self.pre-commit-hooks.${system};
-        }
-      );
-
-      pre-commit-hooks = forAllSystems (
-        system:
-        git-hooks.lib.${system}.run {
-          src = self;
-          hooks = {
-            nixfmt-rfc-style.enable = true;
-            statix.enable = true;
-            deadnix.enable = true;
-            # AST-based secrets lint (catches bad patterns even in module examples)
-            nix-secrets-lint = {
-              enable = true;
-              name = "nix-secrets-lint";
-              entry = "${
-                nixpkgs.legacyPackages.${system}.ast-grep
-              }/bin/ast-grep scan --config ${self}/.ast-grep/sgconfig.yml";
-              types = [ "nix" ];
-              pass_filenames = false;
-            };
-          };
+          pre-commit = pre-commit-hooks.${system};
         }
       );
 
@@ -146,12 +149,12 @@
         {
           default = pkgs.mkShell {
             packages = with pkgs; [
-              nixfmt-rfc-style
+              nixfmt
               statix
               deadnix
               ast-grep
             ];
-            inherit (self.pre-commit-hooks.${system}) shellHook;
+            inherit (pre-commit-hooks.${system}) shellHook;
           };
         }
       );

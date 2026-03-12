@@ -12,18 +12,24 @@
     wget
   ];
 
-  programs.git = {
-    enable = true;
-    delta.enable = true;
-    extraConfig = {
-      init.defaultBranch = "main";
-      push.autoSetupRemote = true;
-      pull.rebase = true;
+  programs = {
+    git = {
+      enable = true;
+      settings = {
+        init.defaultBranch = "main";
+        push.autoSetupRemote = true;
+        pull.rebase = true;
+      };
     };
-  };
 
-  programs.direnv = {
-    enable = true;
-    nix-direnv.enable = true;
+    delta = {
+      enable = true;
+      enableGitIntegration = true;
+    };
+
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
   };
 }

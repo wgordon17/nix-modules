@@ -1,7 +1,5 @@
 { lib, ... }:
 {
-  imports = [ ./impermanence.nix ];
-
   # Safe on NixOS (known bugs on macOS only)
   nix.settings.auto-optimise-store = true;
 
