@@ -1,8 +1,13 @@
-{ pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [ ./homebrew.nix ];
 
-  nix.gc = {
+  nix.gc = lib.mkIf config.nix.enable {
     automatic = true;
     interval.Day = 7;
     options = "--delete-older-than 7d";
@@ -22,7 +27,7 @@
   ];
 
   system = {
-    defaults = {
+    defaults = lib.mkIf (config.system.primaryUser != null) {
       NSGlobalDomain = {
         AppleShowAllExtensions = true;
         AppleShowAllFiles = true;

@@ -7,9 +7,8 @@
   ...
 }:
 {
-  # On darwin with Determinate Nix, nix.* is disabled (determinateNix.enable = true
-  # sets nix.enable = false). These settings only take effect on NixOS.
-  nix = {
+  # On darwin with Determinate Nix, nix.enable = false. Guard all nix.* options.
+  nix = lib.mkIf config.nix.enable {
     settings = {
       trusted-users = [ "@wheel" ];
       experimental-features = [
@@ -30,8 +29,6 @@
 
   # Track which git revision built this system (shows in `nixos-version` / `darwin-rebuild --list-generations`)
   system.configurationRevision = self.rev or self.dirtyRev or null;
-
-  nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = map lib.lowPrio [
     pkgs.curl

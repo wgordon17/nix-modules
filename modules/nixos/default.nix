@@ -1,10 +1,10 @@
-{ lib, ... }:
+{ config, lib, ... }:
 {
-  # Safe on NixOS (known bugs on macOS only)
-  nix.settings.auto-optimise-store = true;
+  # Guard nix.* for consistency (NixOS defaults nix.enable = true,
+  # but Determinate Nix on NixOS would set it false)
+  nix.settings.auto-optimise-store = lib.mkIf config.nix.enable true;
 
-  # GC uses systemd on NixOS
-  nix.gc = {
+  nix.gc = lib.mkIf config.nix.enable {
     automatic = true;
     dates = "weekly";
     persistent = true;
