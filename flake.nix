@@ -52,21 +52,21 @@
       # --- Module exports (consumed by private nix-config repo) ---
 
       darwinModules = {
-        common = ./modules/common;
-        darwin = ./modules/darwin;
+        common = import ./modules/common;
+        darwin = import ./modules/darwin;
       };
 
       nixosModules = {
-        common = ./modules/common;
-        nixos = ./modules/nixos;
-        impermanence = ./modules/nixos/impermanence.nix;
+        common = import ./modules/common;
+        nixos = import ./modules/nixos;
+        impermanence = import ./modules/nixos/impermanence.nix;
       };
 
       homeManagerModules = {
-        base = ./home-manager/features/base.nix;
-        development = ./home-manager/features/development.nix;
-        child = ./home-manager/features/child.nix;
-        media = ./home-manager/features/media.nix;
+        base = import ./home-manager/features/base.nix;
+        development = import ./home-manager/features/development.nix;
+        child = import ./home-manager/features/child.nix;
+        media = import ./home-manager/features/media.nix;
       };
 
       # Reusable types (secretPathType, etc.)

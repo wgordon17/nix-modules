@@ -1,6 +1,7 @@
-_: {
+{ lib, ... }:
+{
   homebrew = {
-    enable = true;
+    enable = lib.mkDefault true;
     onActivation = {
       autoUpdate = false;
       upgrade = false;
